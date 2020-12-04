@@ -1,33 +1,17 @@
 <template>
   <div
-    v-if="isMinimized"
-    :class="{
-      'prodwarn-float-message-minimized': true,
-      'prodwarn-float-message-minimized--bottom': true,
-    }"
-    :title="message"
-    @click="toggleMinimize"
-  >
-    <img
-      src="https://images.viblo.asia/64x-/9cd6ae80-2ec5-4382-99b4-87e8b7ca4b1e.png"
-      class="prodwarn-float-message-icon"
-    />
-  </div>
-
-  <div
-    v-else
     :class="{
       'prodwarn-float-message': true,
       'prodwarn-float-message--bottom': true,
     }"
   >
-    <div v-if="!isMinimized" class="prodwarn-float-message-body">
+    <div class="prodwarn-float-message-body">
       <strong>&#9888;</strong>
       <span>{{ message }}</span>
       <button
         class="prodwarn-float-message-close"
         title="Click to close"
-        @click="toggleMinimize"
+        @click="$emit('close')"
       >
         X
       </button>
@@ -36,27 +20,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import Draggable from '@/content-scripts/components/Draggable.vue';
 
-@Component
+@Component({
+  components: {
+    Draggable,
+  },
+})
 export default class FloatMessage extends Vue {
-  message: string = '!!! Becareful, this is production site. Don\'t take any actions here, please!'
-
-  isMinimized: boolean = false;
-
-  created() {
-    this.isMinimized = Boolean(localStorage.getItem('prodwarn-float-message-minimized'));
-  }
-
-  toggleMinimize() {
-    this.isMinimized = !this.isMinimized;
-
-    if (this.isMinimized) {
-      localStorage.setItem('prodwarn-float-message-minimized', 'true');
-    } else {
-      localStorage.removeItem('prodwarn-float-message-minimized');
-    }
-  }
+  @Prop({ default: '' }) message!: string;
 }
 </script>
 
@@ -119,18 +92,10 @@ export default class FloatMessage extends Vue {
   .prodwarn-float-message {
     &-minimized {
       cursor: pointer;
-      position: fixed;
-      z-index: 999999999;
+      width: 40px;
       animation: shake 0.82s ease infinite;
       img {
         filter: drop-shadow(0 0 6px rgba(0,0,0,0.3));
-        @media screen and (max-width: 1400px) {
-          width: 40px;
-        }
-      }
-      &--bottom {
-        bottom: 20px;
-        left: 20px;
       }
     }
   }
